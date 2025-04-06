@@ -12,7 +12,7 @@ OLLAMA_API = "http://localhost:11434/api/generate"
 def load_data():
     health = pd.read_csv("health_monitoring.csv")
     safety = pd.read_csv("safety_monitoring.csv")
-    reminder = pd.read_csv("reminder.csv")
+    reminder = pd.read_csv("daily_reminder.csv")
     return health, safety, reminder
 
 health_df, safety_df, reminder_df = load_data()
