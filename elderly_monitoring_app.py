@@ -1,18 +1,19 @@
-import pandas as pd
-import requests
+
 import streamlit as st
 st.set_page_config(page_title="Elderly Monitoring", layout="centered", page_icon="🧓")
+import pandas as pd
+import requests
 st.title("👵 Elderly Monitoring Dashboard")
-# CONFIG
+
 MODEL = "tinyllama"
 OLLAMA_API = "http://localhost:11434/api/generate"
 
 # LOAD DATA
 @st.cache_data
 def load_data():
-    health_df = pd.read_csv("C:/Users/Varshit b r/Downloads/health_monitoring.csv")
-    safety_df = pd.read_csv("C:/Users/Varshit b r/Downloads/safety_monitoring.csv")
-    reminder_df = pd.read_csv("C:/Users/Varshit b r/Downloads/daily_reminder.csv")
+    health = pd.read_csv("C:/Users/Varshit b r/Downloads/health_monitoring.csv")
+    safety = pd.read_csv("C:/Users/Varshit b r/Downloads/safety_monitoring.csv")
+    reminder = pd.read_csv("C:/Users/Varshit b r/Downloads/daily_reminder.csv")
     return health, safety, reminder
 
 health_df, safety_df, reminder_df = load_data()
@@ -40,12 +41,26 @@ def reminder_agent(df):
     return alerts
 
 def ollama_ai_summary(alerts):
-    prompt = "You are an elderly care assistant. Summarize these alerts in a helpful, empathetic way:\n\n" + "\n".join(alerts)
-    response = requests.post(OLLAMA_API, json={"model": MODEL, "prompt": prompt})
+    import json
+
+    prompt = "You are an elderly care assistant. Summarize these alerts in a friendly, helpful way:\n\n" + "\n".join(alerts)
+
     try:
-        return response.json().get("response", "⚠️ No summary from AI")
+        response = requests.post(OLLAMA_API, json={"model": MODEL, "prompt": prompt}, stream=True)
+        summary = ""
+
+        for line in response.iter_lines():
+            if line:
+                try:
+                    data = json.loads(line.decode("utf-8"))
+                    summary += data.get("response", "")
+                except json.JSONDecodeError:
+                    pass  # skip malformed chunks
+
+        return summary if summary else "⚠️ No summary generated."
     except Exception as e:
         return f"❌ Ollama error: {e}"
+
 
 # STREAMLIT UI
 
