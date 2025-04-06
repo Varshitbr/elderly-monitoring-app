@@ -10,9 +10,9 @@ OLLAMA_API = "http://localhost:11434/api/generate"
 # LOAD DATA
 @st.cache_data
 def load_data():
-    health = pd.read_csv("health_monitoring.csv")
-    safety = pd.read_csv("safety_monitoring.csv")
-    reminder = pd.read_csv("daily_reminder.csv")
+    health_df = pd.read_csv("C:/Users/Varshit b r/Downloads/health_monitoring.csv")
+    safety_df = pd.read_csv("C:/Users/Varshit b r/Downloads/safety_monitoring.csv")
+    reminder_df = pd.read_csv("C:/Users/Varshit b r/Downloads/daily_reminder.csv")
     return health, safety, reminder
 
 health_df, safety_df, reminder_df = load_data()
