@@ -6,9 +6,9 @@ MODEL = "tinyllama"  # or gemma / phi / mistral
 OLLAMA_API = "http://localhost:11434/api/generate"
 
 # Load datasets
-health = pd.read_csv("health_monitoring.csv")
-safety = pd.read_csv("safety_monitoring.csv")
-reminder = pd.read_csv("daily_reminder.csv")
+health_df = pd.read_csv("C:/Users/Varshit b r/Downloads/health_monitoring.csv")
+safety_df = pd.read_csv("C:/Users/Varshit b r/Downloads/safety_monitoring.csv")
+reminder_df = pd.read_csv("C:/Users/Varshit b r/Downloads/daily_reminder.csv")
 
 # Agent 1: Health Monitor
 def health_monitor(df):
