@@ -65,28 +65,6 @@ with tab2:
 
     st.dataframe(safety_df, use_container_width=True)
 
-    # Fall Detection Bar Chart
-    # if not safety_df.empty:
-    #     try:
-    #         # Normalize column names
-    #         safety_df.columns = safety_df.columns.str.strip().str.lower()
-
-    #         # Count only rows where a fall was detected
-    #         fall_counts = safety_df[safety_df["Fall Detected(Yes/No)"] == "Yes"]
-    #         fall_counts = fall_counts["location"].value_counts().reset_index()
-    #         fall_counts.columns = ["location", "count"]
-
-    #         st.subheader("📊 Fall Count by Location")
-    #         chart = alt.Chart(fall_counts).mark_bar().encode(
-    #             x="location",
-    #             y="count",
-    #             tooltip=["location", "count"]
-    #         ).properties(height=400)
-
-    #         st.altair_chart(chart, use_container_width=True)
-    #     except Exception as e:
-    #         st.error("Error generating fall chart: " + str(e))
-
 
 # Reminders Tab
 with tab3:
