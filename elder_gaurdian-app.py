@@ -60,7 +60,7 @@ with tab2:
         st.write("👀 Safety CSV columns:", safety_df.columns.tolist())
         st.success("✅ Safety data uploaded!")
     else:
-        safety_df = pd.DataFrame(columns=["Timestamp", "Fall Detected(Yes/No)", "Location"])
+        safety_df = pd.DataFrame(columns=["Timestamp", "Fall Detected", "Location"])
         st.info("Upload a file to see safety data.")
 
     st.dataframe(safety_df, use_container_width=True)
