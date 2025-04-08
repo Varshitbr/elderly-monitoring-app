@@ -25,6 +25,7 @@ with tab1:
 
     if health_file:
         health_df = pd.read_csv(health_file)
+        health_df.columns = health_df.columns.str.strip()
         st.success("✅ Health data uploaded!")
     else:
         health_df = pd.DataFrame(columns=["Date", "Heart Rate", "Blood Pressure"])
