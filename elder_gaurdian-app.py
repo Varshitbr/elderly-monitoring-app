@@ -57,6 +57,7 @@ with tab2:
 
     if safety_file:
         safety_df = pd.read_csv(safety_file)
+        st.write("👀 Safety CSV columns:", safety_df.columns.tolist())
         st.success("✅ Safety data uploaded!")
     else:
         safety_df = pd.DataFrame(columns=["Timestamp", "Fall Detected", "Location"])
