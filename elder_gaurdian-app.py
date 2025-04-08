@@ -98,7 +98,7 @@ with tab3:
         reminder_df = pd.read_csv(reminder_file)
         st.success("✅ Reminders uploaded!")
     else:
-        reminder_df = pd.DataFrame(columns=["Timestamp", "Time", "Medication"])
+        reminder_df = pd.DataFrame(columns=["Timestamp", "Scheduled Time", "Reminder Type"])
         st.info("Upload a file to see medication reminders.")
 
     # Editable Table
@@ -109,20 +109,20 @@ with tab3:
     now = datetime.now()
     if not reminder_df.empty:
         try:
-            reminder_df["Datetime"] = pd.to_datetime(reminder_df["Timestamp"] + " " + reminder_df["Time"])
+            reminder_df["Datetime"] = pd.to_datetime(reminder_df["Timestamp"] + " " + reminder_df["Scheduled Time"])
             upcoming = reminder_df[reminder_df["Datetime"] >= now].sort_values("Datetime").head(3)
             missed = reminder_df[reminder_df["Datetime"] < now].sort_values("Datetime", ascending=False).head(3)
 
             st.subheader("🔔 Upcoming Medications")
             if not upcoming.empty:
-                st.table(upcoming[["Timestamp", "Time", "Medication"]])
+                st.table(upcoming[["Timestamp", "Scheduled Time", "Reminder Type"]])
             else:
                 st.info("No upcoming medications.")
 
             st.subheader("⚠️ Missed Medications")
             if not missed.empty:
                 st.error("Some medications may have been missed:")
-                st.table(missed[["Timestamp", "Time", "Medication"]])
+                st.table(missed[["Timestamp", "Scheduled Time", "Reminder Type"]])
             else:
                 st.success("No missed medications!")
         except Exception as e:
