@@ -35,7 +35,9 @@ with tab1:
     # Heart Rate Trend Chart
     if not health_df.empty:
         try:
-            health_df['Date'] = pd.to_datetime(health_df['Date'])
+            health_df.columns = health_df.columns.str.strip()  # 🔧 Fix whitespace
+            health_df['Date'] = pd.to_datetime(health_df['Date'], errors='coerce')
+            health_df.dropna(subset=['Date'], inplace=True)
             st.subheader("📈 Heart Rate Over Time")
             chart = alt.Chart(health_df).mark_line(point=True).encode(
                 x='Date:T',
