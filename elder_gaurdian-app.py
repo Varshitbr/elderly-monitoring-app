@@ -104,10 +104,45 @@ with tab3:
             else:
                 st.success("No missed medications!")
         except Exception as e:
-            st.warning("Could not process medication dates: " + str(e))
-
+            st.warning("Could not process medication dates: " + str(e))            
     # Export edited reminders
     st.subheader("📤 Download Updated Reminders")
     csv = reminder_df.drop(columns=["Datetime"], errors="ignore").to_csv(index=False)
     st.download_button("💾 Download as CSV", data=csv, file_name="updated_reminders.csv", mime="text/csv")
+st.markdown(
+    """
+    <style>
+    @keyframes fadeInUp {
+        0% {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+        padding: 15px 0;
+        font-size: 16px;
+        color: #495057;
+        background-color: #f1f3f5;
+        border-top: 1px solid #dee2e6;
+        animation: fadeInUp 1s ease-out;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        z-index: 100;
+    }
+    </style>
+
+    <div class="footer">
+        🚀 Built with ❤️ for Elderly Care — <strong>Team CareTrackers</strong> 👨‍💻
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
