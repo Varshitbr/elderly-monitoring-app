@@ -28,7 +28,7 @@ with tab1:
         health_df.columns = health_df.columns.str.strip()
         st.success("✅ Health data uploaded!")
     else:
-        health_df = pd.DataFrame(columns=["Date", "Heart Rate", "Blood Pressure"])
+        health_df = pd.DataFrame(columns=["Timestamp", "Heart Rate", "Blood Pressure"])
         st.info("Upload a file to see health data.")
 
     st.dataframe(health_df, use_container_width=True)
@@ -37,13 +37,13 @@ with tab1:
     if not health_df.empty:
         try:
             health_df.columns = health_df.columns.str.strip()  # 🔧 Fix whitespace
-            health_df['Date'] = pd.to_datetime(health_df['Date'], errors='coerce')
-            health_df.dropna(subset=['Date'], inplace=True)
+            health_df['Timestamp'] = pd.to_Timestamp(health_df['Timestamp'], errors='coerce')
+            health_df.dropna(subset=['Timestamp'], inplace=True)
             st.subheader("📈 Heart Rate Over Time")
             chart = alt.Chart(health_df).mark_line(point=True).encode(
-                x='Date:T',
+                x='Timestamp:T',
                 y='Heart Rate:Q',
-                tooltip=['Date', 'Heart Rate']
+                tooltip=['Timestamp', 'Heart Rate']
             ).properties(height=400)
             st.altair_chart(chart, use_container_width=True)
         except Exception as e:
