@@ -37,7 +37,7 @@ with tab1:
     if not health_df.empty:
         try:
             health_df.columns = health_df.columns.str.strip()  # 🔧 Fix whitespace
-            health_df['Timestamp'] = pd.to_Timestamp(health_df['Timestamp'], errors='coerce')
+            health_df['Timestamp'] = pd.to_datetime(health_df['Timestamp'], errors='coerce')
             health_df.dropna(subset=['Timestamp'], inplace=True)
             st.subheader("📈 Heart Rate Over Time")
             chart = alt.Chart(health_df).mark_line(point=True).encode(
