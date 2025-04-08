@@ -59,7 +59,7 @@ with tab2:
         safety_df = pd.read_csv(safety_file)
         st.success("✅ Safety data uploaded!")
     else:
-        safety_df = pd.DataFrame(columns=["Date", "Fall Detected", "Location"])
+        safety_df = pd.DataFrame(columns=["Timestamp", "Fall Detected", "Location"])
         st.info("Upload a file to see safety data.")
 
     st.dataframe(safety_df, use_container_width=True)
@@ -71,7 +71,7 @@ with tab2:
             safety_df.columns = safety_df.columns.str.strip().str.lower()
 
             # Count only rows where a fall was detected
-            fall_counts = safety_df[safety_df["fall detected"] == "Yes"]
+            fall_counts = safety_df[safety_df["Fall Detected"] == "Yes"]
             fall_counts = fall_counts["location"].value_counts().reset_index()
             fall_counts.columns = ["location", "count"]
 
