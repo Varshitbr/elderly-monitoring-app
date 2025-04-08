@@ -1,40 +1,124 @@
 import streamlit as st
 import pandas as pd
+import altair as alt
+from io import StringIO
+from datetime import datetime
 
 st.set_page_config(page_title="👵 Elderly Monitoring Dashboard", layout="wide")
-
 st.title("👵 Elderly Monitoring Dashboard")
 
-# Upload health CSV
-health_file = st.file_uploader("📋 Upload Health Monitoring CSV", type="csv", key="health")
-if health_file is not None:
-    health_df = pd.read_csv(health_file)
-else:
-    health_df = pd.DataFrame(columns=["Date", "Heart Rate", "Blood Pressure"])
-    st.info("Please upload a health CSV to view data.")
+# Sample data
+sample_health_csv = "Date,Heart Rate,Blood Pressure\n2025-04-01,72,120/80\n2025-04-02,75,122/82"
+sample_safety_csv = "Date,Fall Detected,Location\n2025-04-01,No,Bedroom\n2025-04-02,Yes,Bathroom"
+sample_reminder_csv = "Date,Time,Medication\n2025-04-01,08:00,Aspirin\n2025-04-02,18:00,Vitamin D"
 
-# Upload safety CSV
-safety_file = st.file_uploader("🛡️ Upload Safety Monitoring CSV", type="csv", key="safety")
-if safety_file is not None:
-    safety_df = pd.read_csv(safety_file)
-else:
-    safety_df = pd.DataFrame(columns=["Date", "Fall Detected", "Location"])
-    st.info("Please upload a safety CSV to view data.")
+def sample_download_button(label, data, filename):
+    st.download_button(label=label, data=data, file_name=filename, mime="text/csv")
 
-# Upload reminders CSV
-reminder_file = st.file_uploader("⏰ Upload Medication Reminders CSV", type="csv", key="reminder")
-if reminder_file is not None:
-    reminder_df = pd.read_csv(reminder_file)
-else:
-    reminder_df = pd.DataFrame(columns=["Date", "Time", "Medication"])
-    st.info("Please upload a reminders CSV to view data.")
+tab1, tab2, tab3 = st.tabs(["📋 Health", "🛡️ Safety", "⏰ Reminders"])
 
-# Display tables
-with st.expander("📊 Health Data"):
-    st.dataframe(health_df)
+# Health Tab
+with tab1:
+    st.header("📋 Health Monitoring")
+    health_file = st.file_uploader("Upload Health CSV", type="csv", key="health")
+    sample_download_button("📥 Download Sample Health CSV", sample_health_csv, "sample_health.csv")
 
-with st.expander("🛡️ Safety Data"):
-    st.dataframe(safety_df)
+    if health_file:
+        health_df = pd.read_csv(health_file)
+        st.success("✅ Health data uploaded!")
+    else:
+        health_df = pd.DataFrame(columns=["Date", "Heart Rate", "Blood Pressure"])
+        st.info("Upload a file to see health data.")
 
-with st.expander("⏰ Reminders"):
-    st.dataframe(reminder_df)
+    st.dataframe(health_df, use_container_width=True)
+
+    # Heart Rate Trend Chart
+    if not health_df.empty:
+        try:
+            health_df['Date'] = pd.to_datetime(health_df['Date'])
+            st.subheader("📈 Heart Rate Over Time")
+            chart = alt.Chart(health_df).mark_line(point=True).encode(
+                x='Date:T',
+                y='Heart Rate:Q',
+                tooltip=['Date', 'Heart Rate']
+            ).properties(height=400)
+            st.altair_chart(chart, use_container_width=True)
+        except Exception as e:
+            st.error("Error generating chart: " + str(e))
+
+# Safety Tab
+with tab2:
+    st.header("🛡️ Safety Monitoring")
+    safety_file = st.file_uploader("Upload Safety CSV", type="csv", key="safety")
+    sample_download_button("📥 Download Sample Safety CSV", sample_safety_csv, "sample_safety.csv")
+
+    if safety_file:
+        safety_df = pd.read_csv(safety_file)
+        st.success("✅ Safety data uploaded!")
+    else:
+        safety_df = pd.DataFrame(columns=["Date", "Fall Detected", "Location"])
+        st.info("Upload a file to see safety data.")
+
+    st.dataframe(safety_df, use_container_width=True)
+
+    # Fall Detection Bar Chart
+    if not safety_df.empty:
+        try:
+            st.subheader("📊 Fall Count by Location")
+            fall_counts = safety_df[safety_df["Fall Detected"].str.lower() == "yes"]["Location"].value_counts().reset_index()
+            fall_counts.columns = ["Location", "Count"]
+
+            chart = alt.Chart(fall_counts).mark_bar().encode(
+                x="Location",
+                y="Count",
+                tooltip=["Location", "Count"]
+            ).properties(height=400)
+            st.altair_chart(chart, use_container_width=True)
+        except Exception as e:
+            st.error("Error generating fall chart: " + str(e))
+
+# Reminders Tab
+with tab3:
+    st.header("⏰ Medication Reminders")
+    reminder_file = st.file_uploader("Upload Reminder CSV", type="csv", key="reminder")
+    sample_download_button("📥 Download Sample Reminder CSV", sample_reminder_csv, "sample_reminder.csv")
+
+    if reminder_file:
+        reminder_df = pd.read_csv(reminder_file)
+        st.success("✅ Reminders uploaded!")
+    else:
+        reminder_df = pd.DataFrame(columns=["Date", "Time", "Medication"])
+        st.info("Upload a file to see medication reminders.")
+
+    # Editable Table
+    st.subheader("📝 Edit Medication Schedule")
+    reminder_df = st.data_editor(reminder_df, num_rows="dynamic", use_container_width=True)
+
+    # Alerts for upcoming / missed meds
+    now = datetime.now()
+    if not reminder_df.empty:
+        try:
+            reminder_df["Datetime"] = pd.to_datetime(reminder_df["Date"] + " " + reminder_df["Time"])
+            upcoming = reminder_df[reminder_df["Datetime"] >= now].sort_values("Datetime").head(3)
+            missed = reminder_df[reminder_df["Datetime"] < now].sort_values("Datetime", ascending=False).head(3)
+
+            st.subheader("🔔 Upcoming Medications")
+            if not upcoming.empty:
+                st.table(upcoming[["Date", "Time", "Medication"]])
+            else:
+                st.info("No upcoming medications.")
+
+            st.subheader("⚠️ Missed Medications")
+            if not missed.empty:
+                st.error("Some medications may have been missed:")
+                st.table(missed[["Date", "Time", "Medication"]])
+            else:
+                st.success("No missed medications!")
+        except Exception as e:
+            st.warning("Could not process medication dates: " + str(e))
+
+    # Export edited reminders
+    st.subheader("📤 Download Updated Reminders")
+    csv = reminder_df.drop(columns=["Datetime"], errors="ignore").to_csv(index=False)
+    st.download_button("💾 Download as CSV", data=csv, file_name="updated_reminders.csv", mime="text/csv")
+
